@@ -5,5 +5,8 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/MarioAI4J"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/MarioAI4J-Tournament"/>
 	<classpathentry kind="lib" path="/MarioAI4J-Tournament/lib/jsap-2.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Honkl/Disk Google/Master/MarioAI/MarioAI4J-Playground/lib/gson-2.7-javadoc.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Honkl/Disk Google/Master/MarioAI/MarioAI4J-Playground/lib/gson-2.7-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Honkl/Disk Google/Master/MarioAI/MarioAI4J-Playground/lib/gson-2.7.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
