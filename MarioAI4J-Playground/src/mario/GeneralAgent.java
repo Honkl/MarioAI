@@ -3,6 +3,8 @@ package mario;
 import java.awt.Graphics;
 import java.io.*;
 
+import org.omg.CORBA.PUBLIC_MEMBER;
+
 import ch.idsia.agents.AgentOptions;
 import ch.idsia.agents.IAgent;
 import ch.idsia.agents.controllers.MarioHijackAIBase;
@@ -21,31 +23,36 @@ import ch.idsia.tools.EvaluationInfo;
 /**
  * Code your custom agent here!
  * 
- * Change {@link #actionSelection()} implementation to alter the behavior of your Mario.
+ * Change {@link #actionSelection()} implementation to alter the behavior of
+ * your Mario.
  * 
- * Change {@link #debugDraw(VisualizationComponent, LevelScene, IEnvironment, Graphics)} to draw custom debug stuff.
+ * Change
+ * {@link #debugDraw(VisualizationComponent, LevelScene, IEnvironment, Graphics)}
+ * to draw custom debug stuff.
  * 
  * You can change the type of level you want to play in {@link #main(String[])}.
  * 
- * Once you have your agent ready, you may use {@link Evaluate} class to benchmark the quality of your AI. 
+ * Once you have your agent ready, you may use {@link Evaluate} class to
+ * benchmark the quality of your AI.
  */
 public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 
 	private static BufferedWriter writer;
 	private static BufferedReader reader;
-	
+
 	@Override
 	public void reset(AgentOptions options) {
 		super.reset(options);
 	}
-	
+
 	@Override
-	public void debugDraw(VisualizationComponent vis, LevelScene level,	IEnvironment env, Graphics g) {
+	public void debugDraw(VisualizationComponent vis, LevelScene level, IEnvironment env, Graphics g) {
 		super.debugDraw(vis, level, env, g);
-		if (mario == null) return;
+		if (mario == null)
+			return;
 
 		// provide custom visualization using 'g'
-		
+
 		// EXAMPLE DEBUG VISUALIZATION
 		String debug = "MY DEBUG STRING";
 		VisualizationComponent.drawStringDropShadow(g, debug, 0, 26, 1);
@@ -65,77 +72,101 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 	@Override
 	public MarioInput actionSelectionAI() {
 		try {
-			String json = new JsonMessageObject(mario, e, t).convertToJson() + "\n";
+			JsonMessageObject jmo = new JsonMessageObject(mario, e, t);
+			String json = jmo.convertToJson() + "\n";
 			//System.out.println(json);
 			writer.write(json);
 			writer.flush();
 			String output = reader.readLine();
+			
+			for (MarioInputKey key : jmo.decodeMove(Integer.parseInt(output))) {
+				switch (key) {
+				case RUN_LEFT:
+					control.runLeft();
+					break;
+				case RUN_RIGHT:
+					control.runRight();
+					break;
+				case JUMP:
+					control.jump();
+					break;
+				case SHOOT:
+					control.shoot();
+					break;
+				case SPRINT:
+					control.sprint();
+					break;
+				}
+			}
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		control.runRight();
-		control.sprint();
-		control.shoot();
-		
-		if (mario.mayJump || !mario.onGround) {
-			control.jump();
-		}
 		return action;
 	}
-	
+
+	public enum MarioInputKey {
+		RUN_RIGHT, RUN_LEFT, JUMP, SPRINT, SHOOT
+	}
+
 	public static void main(String[] args) throws IOException {
 		// UNCOMMENT THE LINE OF THE LEVEL YOU WISH TO RUN
-		
-		//LevelConfig level = LevelConfig.LEVEL_0_FLAT;
-		//LevelConfig level = LevelConfig.LEVEL_1_JUMPING;
+
+		// LevelConfig level = LevelConfig.LEVEL_0_FLAT;
+		// LevelConfig level = LevelConfig.LEVEL_1_JUMPING;
 		LevelConfig level = LevelConfig.LEVEL_2_GOOMBAS;
-		//LevelConfig level = LevelConfig.LEVEL_3_TUBES;
-		//LevelConfig level = LevelConfig.LEVEL_4_SPIKIES;
-		
+		// LevelConfig level = LevelConfig.LEVEL_3_TUBES;
+		// LevelConfig level = LevelConfig.LEVEL_4_SPIKIES;
+
 		// CREATE SIMULATOR
 		//MarioSimulator simulator = new MarioSimulator(level.getOptions());
 		MarioSimulator simulator = new MarioSimulator(level.getOptionsVisualizationOff());
-		  
-		// CREATE SIMULATOR AND RANDOMIZE LEVEL GENERATION
-		// -- if you wish to use this, comment out the line above and uncomment line below
 		//MarioSimulator simulator = new MarioSimulator(level.getOptionsRandomized());
-		
+
+		// CREATE SIMULATOR AND RANDOMIZE LEVEL GENERATION
+		// -- if you wish to use this, comment out the line above and uncomment
+		// line below
+		// MarioSimulator simulator = new
+		// MarioSimulator(level.getOptionsRandomized());
+
 		// START PYTHON PROCESS
-		
-        String pythonExePath = "C:\\Anaconda2\\envs\\py3k\\python.exe"; // TODO: use general relative path
-        String pythonScriptPath = "..\\..\\general-ai\\Controller\\script.py";
-        String currentDir = System.getProperty("user.dir");
-        
+
+		String pythonExePath = "C:\\Anaconda2\\envs\\py3k\\python.exe"; // TODO: use general relative path
+		String pythonScriptPath = "..\\..\\general-ai\\Controller\\script.py";
+		String currentDir = System.getProperty("user.dir");
+
 		Runtime rt = Runtime.getRuntime();
-		Process p = rt.exec(new String[]{pythonExePath, currentDir + "\\" + pythonScriptPath});
-		
+		Process p = rt.exec(new String[] { pythonExePath, currentDir + "\\" + pythonScriptPath });
+
 		writer = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
 		reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
 		// RUN THE SIMULATION
 		IAgent agent = new GeneralAgent();
 		EvaluationInfo info = simulator.run(agent);
-		
+
+		writer.write("END");
+
 		// CHECK RESULT
 		switch (info.getResult()) {
 		case LEVEL_TIMEDOUT:
 			System.out.println("LEVEL TIMED OUT!");
 			break;
-			
+
 		case MARIO_DIED:
 			System.out.println("MARIO KILLED");
 			break;
-			
+
 		case SIMULATION_RUNNING:
 			System.out.println("SIMULATION STILL RUNNING?");
 			throw new RuntimeException("Invalid evaluation info state, simulation should not be running.");
-			
+
 		case VICTORY:
 			System.out.println("VICTORY!!!");
 			break;
 		}
 	}
-	
+
 }
