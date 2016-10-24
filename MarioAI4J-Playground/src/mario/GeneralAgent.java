@@ -2,7 +2,6 @@ package mario;
 
 import java.awt.Graphics;
 import java.io.*;
-import java.lang.*;
 
 import ch.idsia.agents.AgentOptions;
 import ch.idsia.agents.IAgent;
@@ -67,34 +66,38 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 	public MarioInput actionSelectionAI() {
 		try {
 			String json = new JsonMessageObject(mario, e, t).convertToJson() + "\n";
-			System.out.print("WRITE: " + json);
+			//System.out.println(json);
 			writer.write(json);
-			
 			writer.flush();
 			String output = reader.readLine();
-			System.out.println("READ:" + output);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		control.runRight();
-		// RETURN THE RESULT
+		control.sprint();
+		control.shoot();
+		
+		if (mario.mayJump || !mario.onGround) {
+			control.jump();
+		}
 		return action;
 	}
 	
 	public static void main(String[] args) throws IOException {
 		// UNCOMMENT THE LINE OF THE LEVEL YOU WISH TO RUN
 		
-		LevelConfig level = LevelConfig.LEVEL_0_FLAT;
+		//LevelConfig level = LevelConfig.LEVEL_0_FLAT;
 		//LevelConfig level = LevelConfig.LEVEL_1_JUMPING;
-		//LevelConfig level = LevelConfig.LEVEL_2_GOOMBAS;
+		LevelConfig level = LevelConfig.LEVEL_2_GOOMBAS;
 		//LevelConfig level = LevelConfig.LEVEL_3_TUBES;
 		//LevelConfig level = LevelConfig.LEVEL_4_SPIKIES;
 		
 		// CREATE SIMULATOR
-		MarioSimulator simulator = new MarioSimulator(level.getOptions());
-		
+		//MarioSimulator simulator = new MarioSimulator(level.getOptions());
+		MarioSimulator simulator = new MarioSimulator(level.getOptionsVisualizationOff());
+		  
 		// CREATE SIMULATOR AND RANDOMIZE LEVEL GENERATION
 		// -- if you wish to use this, comment out the line above and uncomment line below
 		//MarioSimulator simulator = new MarioSimulator(level.getOptionsRandomized());
@@ -107,13 +110,6 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
         
 		Runtime rt = Runtime.getRuntime();
 		Process p = rt.exec(new String[]{pythonExePath, currentDir + "\\" + pythonScriptPath});
-		
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
 		writer = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
 		reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
