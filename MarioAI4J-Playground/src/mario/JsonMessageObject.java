@@ -10,80 +10,20 @@ import ch.idsia.benchmark.mario.engine.generalization.Entity;
 import ch.idsia.benchmark.mario.engine.generalization.EntityType;
 import ch.idsia.benchmark.mario.engine.generalization.MarioEntity;
 import ch.idsia.benchmark.mario.engine.generalization.Tile;
+import jdk.management.resource.internal.inst.SocketOutputStreamRMHooks;
 import mario.GeneralAgent.MarioInputKey;
 
 public class JsonMessageObject {
 
 	private class SerializableEntity {
 
-		int dTX, dTY;
-		float dX, dY, height, speedX, speedY;
-		String type;
 
-		public SerializableEntity(Entity e) {
-			dTX = e.dTX;
-			dTY = e.dTY;
-			dX = e.dX;
-			dY = e.dY;
-			height = e.height;
-			speedX = e.speed.x;
-			speedY = e.speed.y;
-			type = e.type.toString();
-			// TODO: Sprite
-		}
-	}
-
-	private class SerializableMario {
-
-		boolean carrying, mayJump, mayShoot, onGround;
-		int dtX, dtY, egoCol, egoRow, inTileX, inTileY;
-		int killsByFire, killsByShell, killsByStomp, killsTotal;
-		float dX, dY, height, speedX, speedY;
-		String mode;
-		int receptiveFieldHeight, receptiveFieldWidth, status, timeLeft, timeSpent;
-		int zLevelEntities, zLevelTiles;
-		int[] state;
-
-		public SerializableMario(MarioEntity m) {
-			carrying = m.carrying;
-			dtX = m.dTX;
-			dtY = m.dTY;
-			dX = m.dX;
-			dY = m.dY;
-			egoCol = m.egoCol;
-			egoRow = m.egoRow;
-			height = m.height;
-			inTileX = m.inTileX;
-			inTileY = m.inTileY;
-			killsByFire = m.killsByFire;
-			killsByShell = m.killsByShell;
-			killsByStomp = m.killsByStomp;
-			killsTotal = m.killsTotal;
-			mayJump = m.mayJump;
-			mayShoot = m.mayShoot;
-			mode = m.mode.toString();
-			onGround = m.onGround;
-			receptiveFieldHeight = m.receptiveFieldHeight;
-			receptiveFieldWidth = m.receptiveFieldWidth;
-			speedX = m.speed.x;
-			speedY = m.speed.y;
-			state = m.state;
-			status = m.status;
-			timeLeft = m.timeLeft;
-			timeSpent = m.timeSpent;
-			zLevelEntities = m.zLevelEntities;
-			zLevelTiles = m.zLevelTiles;
-		}
 	}
 
 	// Properties that will be serialized to JSON
-	SerializableMario mario = null;
-	Tile[][] map = null;
-	List<SerializableEntity> entities = new ArrayList<>();
-
-	// Special "property" (must have this name)
-	int[] possible_moves;
-
+	int current_phase = 0;
+	Double[] state;
+	
 	// This property is not serialized via Gson
 	private transient List<List<MarioInputKey>> subsets;
 
@@ -92,26 +32,14 @@ public class JsonMessageObject {
 	 * state of the game.
 	 */
 	public JsonMessageObject(MarioEntity m, Entities e, Tiles t) {
-		mario = new SerializableMario(m);
-		map = t.tileField;
-
-		for (Entity en : e.entities) {
-			if (en.type.equals(EntityType.NOTHING)) {
-				continue;
-			}
-			entities.add(new SerializableEntity(en));
-		}
-
+		state = encodeState(m, e, t);
+				
 		// Generate subsets of available actions.  AI agent will choose
 		// one of those subsets as a result (which will be decoded back
 		// to the action later)
 
 		List<MarioInputKey> set = new ArrayList<>();
-
-		// JUMP action can be done only if mario may jump (or is in air)
-		if (mario.mayJump || !mario.onGround) {
-			set.add(MarioInputKey.JUMP);
-		}
+		set.add(MarioInputKey.JUMP);
 		set.add(MarioInputKey.RUN_LEFT);
 		set.add(MarioInputKey.RUN_RIGHT);
 		set.add(MarioInputKey.SHOOT);
@@ -121,7 +49,6 @@ public class JsonMessageObject {
 		// unnecessary subsets (empty set or sets which contain
 		// both RUN_LEFT and RUN_RIGHT)
 		subsets = getSubsets(set);
-		
 		List<List<MarioInputKey>> toBeRemoved = new ArrayList<>();
 		for (List<MarioInputKey> subset : subsets) {
 			boolean hasLeft = false;
@@ -139,19 +66,126 @@ public class JsonMessageObject {
 			}
 		}
 		subsets.removeAll(toBeRemoved);
-		possible_moves = encodeMoves();
 	}
 
-	public int[] encodeMoves() {
-		int[] result = new int[subsets.size()];
-		for (int i = 0; i < result.length; i++) {
-			result[i] = i;
+	private Double[] encodeState(MarioEntity m, Entities e, Tiles t) {
+
+		List<Double> state = new ArrayList<>();
+
+		// MARIO VALUES 
+		// Boolean values
+		state.add(booleanToDouble(m.carrying));
+		state.add(booleanToDouble(m.mayJump));
+		state.add(booleanToDouble(m.mayShoot));
+		state.add(booleanToDouble(m.onGround));
+		
+		// Int values
+		state.add((double)m.dTX);
+		state.add((double)m.dTY);
+		state.add((double)m.egoCol);
+		state.add((double)m.egoRow);
+		state.add((double)m.inTileX);
+		state.add((double)m.inTileY);
+		state.add((double)m.killsByFire);
+		state.add((double)m.killsByShell);
+		state.add((double)m.killsByStomp);
+		state.add((double)m.killsTotal);
+		state.add((double)m.receptiveFieldHeight);
+		state.add((double)m.receptiveFieldWidth);
+		state.add((double)m.status);
+		state.add((double)m.timeLeft);
+		state.add((double)m.timeSpent);
+		state.add((double)m.zLevelEntities);
+		state.add((double)m.zLevelTiles);
+		
+		// Float values
+		state.add((double)m.dX);
+		state.add((double)m.height);
+		state.add((double)m.speed.x);
+		state.add((double)m.speed.y);
+
+		// String / Enum
+		state.add((double)m.mode.ordinal());
+		
+		// ENVIROMENT VALUES
+		for (int i = 0; i < t.tileField.length; i++) {
+			for (int j = 0; j < t.tileField[0].length; j++) {
+				state.add((double)t.tileField[i][j].ordinal());
+			}
 		}
+		
+		for (int i = 0; i < e.entityField.length; i++) {
+			for (int j = 0; j < e.entityField[0].length; j++) {
+				List<Entity> ents = e.entityField[i][j];
+				for (double value : getWorstEnemyProperties(ents)) {
+					state.add(value);
+				}
+			}
+		}
+		
+		Double[] result = new Double[state.size()];
+		state.toArray(result);
 		return result;
 	}
-
-	public List<MarioInputKey> decodeMove(int inputForMario) {
-		return subsets.get(inputForMario);
+	
+	private double[] getWorstEnemyProperties(List<Entity> ents) {
+		int numOfProperties = 8;
+		if (ents.isEmpty()) {
+			return new double[numOfProperties];
+		}
+		
+		Entity worst = null;
+		for (Entity en : ents) {
+			if (en.type.equals(EntityType.SPIKES)) {
+				worst = en;
+				break;
+			} else if (en.type.equals(EntityType.DANGER)) {
+				worst = en;
+			}
+			if (en.type.equals(EntityType.NOTHING) && worst != null) {
+				continue;
+			}
+			worst = en;
+		}
+		
+		return new double[] { 
+				worst.dTX,
+				worst.dTY,
+				worst.dX,
+				worst.dY,
+				worst.height,
+				worst.speed.x,
+				worst.speed.y,
+				worst.type.ordinal()
+			};
+	}
+	
+	/**
+	 * Converts the specified boolean value to double.
+	 * @param value Value to be converted.
+	 * @return 1 or 0.
+	 */
+	private double booleanToDouble(boolean value) {
+		return value ? 1 : 0;
+	}
+	
+	/**
+	 * Decodes a result sent from the AI.
+	 * @param outputFromAI AI result.
+	 * @return List of MarioInputKey - keys that AI wants to press.
+	 */
+	public List<MarioInputKey> decodeMove(String outputFromAI) {
+		String[] parts = outputFromAI.split(" ");
+		int maxIndex = -1;
+		double maxValue = Double.MIN_VALUE;
+		for (int i = 0; i < subsets.size(); i++) {
+			double value = Double.parseDouble(parts[i]);
+			if (value > maxValue) {
+				maxValue = value;
+				maxIndex = i;
+			}
+		}
+		return subsets.get(maxIndex);
 	}
 
 	/**

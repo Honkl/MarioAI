@@ -79,7 +79,7 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 			writer.flush();
 			String output = reader.readLine();
 			
-			for (MarioInputKey key : jmo.decodeMove(Integer.parseInt(output))) {
+			for (MarioInputKey key : jmo.decodeMove(output)) {
 				switch (key) {
 				case RUN_LEFT:
 					control.runLeft();
@@ -103,6 +103,7 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 		
 		return action;
 	}
@@ -137,12 +138,15 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 		String pythonScriptPath = "..\\..\\general-ai\\Controller\\script.py";
 		String currentDir = System.getProperty("user.dir");
 
-		Runtime rt = Runtime.getRuntime();
-		Process p = rt.exec(new String[] { pythonExePath, currentDir + "\\" + pythonScriptPath });
+		ProcessBuilder pb = new ProcessBuilder(new String[] { pythonExePath, currentDir + "\\" + pythonScriptPath });
+		pb.redirectErrorStream(true);
+		Process p = pb.start();
 
 		writer = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
 		reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
+		writer.write("Mario\n");
+		
 		// RUN THE SIMULATION
 		IAgent agent = new GeneralAgent();
 		EvaluationInfo info = simulator.run(agent);
