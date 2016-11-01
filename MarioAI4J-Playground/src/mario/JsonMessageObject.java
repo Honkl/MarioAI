@@ -15,11 +15,6 @@ import mario.GeneralAgent.MarioInputKey;
 
 public class JsonMessageObject {
 
-	private class SerializableEntity {
-
-
-	}
-
 	// Properties that will be serialized to JSON
 	int current_phase = 0;
 	Double[] state;
@@ -176,6 +171,11 @@ public class JsonMessageObject {
 	 */
 	public List<MarioInputKey> decodeMove(String outputFromAI) {
 		String[] parts = outputFromAI.split(" ");
+		
+		if (parts.length != subsets.size()) {
+			throw new RuntimeException("Wrong number of results from AI.");
+		}
+		
 		int maxIndex = -1;
 		double maxValue = Double.MIN_VALUE;
 		for (int i = 0; i < subsets.size(); i++) {
