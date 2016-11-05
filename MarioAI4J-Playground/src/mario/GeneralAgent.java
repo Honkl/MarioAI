@@ -133,12 +133,14 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 		// MarioSimulator(level.getOptionsRandomized());
 
 		// START PYTHON PROCESS
-
-		String pythonExePath = "C:\\Anaconda2\\envs\\py3k\\python.exe"; // TODO: use general relative path
-		String pythonScriptPath = "..\\..\\general-ai\\Controller\\script.py";
-		String currentDir = System.getProperty("user.dir");
-
-		ProcessBuilder pb = new ProcessBuilder(new String[] { pythonExePath, currentDir + "\\" + pythonScriptPath });
+		
+		String pythonScriptPath = args[0];
+		String pythonExePath = args[1];
+		
+		System.out.println(pythonScriptPath);
+		System.out.println(pythonExePath);
+		
+		ProcessBuilder pb = new ProcessBuilder(new String[] { pythonExePath, pythonScriptPath });
 		pb.redirectErrorStream(true);
 		Process p = pb.start();
 
