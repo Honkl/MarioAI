@@ -3,8 +3,6 @@ package mario;
 import java.awt.Graphics;
 import java.io.*;
 
-import org.omg.CORBA.PUBLIC_MEMBER;
-
 import ch.idsia.agents.AgentOptions;
 import ch.idsia.agents.IAgent;
 import ch.idsia.agents.controllers.MarioHijackAIBase;
