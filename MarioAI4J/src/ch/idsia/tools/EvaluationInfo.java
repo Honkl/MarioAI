@@ -206,84 +206,27 @@ public final class EvaluationInfo implements Cloneable {
 		} finally {			
 		}
 
-		return      "Evaluation Results for Task : "
-				+ taskName
-				+ "\n          Evaluation lasted : "
-				+ Long.toString(evaluationLasted)
-				+ " ms"
-				+ "\n           Weighted Fitness : "
-				+ df.format(computeWeightedFitness())
-				+ "\n               Mario Status : "
-				+ ((marioStatus == Mario.STATUS_WIN) ? "WIN!" : "Loss...")
-				+ "\n                 Mario Mode : "
-				+ marioMode.name()
-				+ "\n  Collisions with creatures : "
-				+ collisionsWithCreatures
-				+ "\n       Passed (Cells, Phys) : "
-				+ distancePassedCells
-				+ " of "
-				+ levelLength
-				+ ", "
-				+ df.format(distancePassedPhys)
-				+ " of "
-				+ df.format(levelLength * 16)
-				+ " ("
-				+ distancePassedCells * 100 / levelLength
-				+ "% passed)"
-				+ "\n   Time Spent(marioseconds) : "
-				+ timeSpent
-				+ "\n    Time Left(marioseconds) : "
-				+ timeLeft
-				+ "\n               Coins Gained : "
-				+ coinsGained
-				+ " of "
-				+ totalNumberOfCoins
-				+ " ("
-				+ coinsGained * 100
-						/ (totalNumberOfCoins == 0 ? 1 : totalNumberOfCoins)
-				+ "% collected)"
-				+ "\n        Hidden Blocks Found : "
-				+ hiddenBlocksFound
-				+ " of "
-				+ totalNumberOfHiddenBlocks
-				+ " ("
-				+ hiddenBlocksFound
-						* 100
-						/ (totalNumberOfHiddenBlocks == 0 ? 1
-								: totalNumberOfHiddenBlocks)
-				+ "% found)"
-				+ "\n         Mushrooms Devoured : "
-				+ mushroomsDevoured
-				+ " of "
-				+ totalNumberOfMushrooms
-				+ " found ("
-				+ mushroomsDevoured
-						* 100
-						/ (totalNumberOfMushrooms == 0 ? 1
-								: totalNumberOfMushrooms)
-				+ "% collected)"
-				+ "\n           Flowers Devoured : "
-				+ flowersDevoured
-				+ " of "
-				+ totalNumberOfFlowers
-				+ " found ("
-				+ flowersDevoured
-						* 100
-						/ (totalNumberOfFlowers == 0 ? 1 : totalNumberOfFlowers)
-				+ "% collected)"
-				+ "\n                kills Total : "
-				+ killsTotal
-				+ " of "
-				+ totalNumberOfCreatures
-				+ " found ("
-				+ killsTotal
-						* 100
-						/ (totalNumberOfCreatures == 0 ? 1
-								: totalNumberOfCreatures) + "%)"
-				+ "\n              kills By Fire : " + killsByFire
-				+ "\n             kills By Shell : " + killsByShell
-				+ "\n             kills By Stomp : " + killsByStomp
-				+ ((Memo.equals("")) ? "" : "\nMEMO INFO: " + Memo);
+		double coins = totalNumberOfCoins == 0 ? 0 : ((double)coinsGained / (double)totalNumberOfCoins);
+		double hidden = totalNumberOfHiddenBlocks == 0 ? 0 : ((double)hiddenBlocksFound / (double)totalNumberOfHiddenBlocks);
+		double mushDevoured = totalNumberOfMushrooms == 0 ? 0 : ((double)mushroomsDevoured / (double)totalNumberOfMushrooms);
+		double flowDevoured = totalNumberOfFlowers == 0 ? 0 : ((double)flowersDevoured / (double)totalNumberOfFlowers); 
+		double kills = totalNumberOfCreatures == 0 ? 0 : ((double)killsTotal / (double)totalNumberOfCreatures); 
+		
+		return 
+				"status=" + ((marioStatus == Mario.STATUS_WIN) ? "1" : "0") + ";" +				
+				"mode=" + marioMode.ordinal() + ";" +
+				"collisionsWithCreatures=" + collisionsWithCreatures + ";" +
+				"passedDistance=" + ((double) distancePassedCells / (double)levelLength) + ";" +
+				"timeSpend=" + timeSpent + ";" +
+				"timeLeft=" + timeLeft + ";" +
+				"coinsGained=" + coins + ";" +
+				"hiddenBlocksFound=" + hidden + ";" +
+				"mushroomsDevoured=" + mushDevoured + ";" +				
+				"flowersDevoured=" + flowDevoured + ";" +
+				"killsTotal=" + kills + ";" +
+				"killsByFire=" + killsByFire + ";" +
+				"killsByShell=" + killsByShell + ";" +
+				"killsByStomp=" + killsByStomp;
 	}
 
 	public String toStringSingleLine() {
