@@ -135,17 +135,15 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 		String pythonScriptPath = args[0];
 		String pythonExePath = args[1];
 		
-		System.out.println(pythonScriptPath);
-		System.out.println(pythonExePath);
+		//Config file for AI (relative path to master "general-ai/Game-interfaces" directory
+		String configFile = "Game-interfaces\\Mario\\Mario_config.txt"; 
 		
-		ProcessBuilder pb = new ProcessBuilder(new String[] { pythonExePath, pythonScriptPath });
+		ProcessBuilder pb = new ProcessBuilder(new String[] { pythonExePath, pythonScriptPath, configFile });
 		pb.redirectErrorStream(true);
 		Process p = pb.start();
 
 		writer = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
 		reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-		writer.write("Mario\n");
 		
 		// RUN THE SIMULATION
 		IAgent agent = new GeneralAgent();
