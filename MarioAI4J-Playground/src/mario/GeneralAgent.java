@@ -75,6 +75,7 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 			//System.out.println(json);
 			writer.write(json);
 			writer.flush();
+			
 			String output = reader.readLine();
 			
 			for (MarioInputKey key : jmo.decodeMove(output)) {
@@ -134,11 +135,14 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 		
 		String pythonScriptPath = args[0];
 		String pythonExePath = args[1];
+		String modelConfigFile = args[2];
+		
 		
 		//Config file for AI (relative path to master "general-ai/Game-interfaces" directory
-		String configFile = "Game-interfaces\\Mario\\Mario_config.txt"; 
+		String gameConfigFile = "Game-interfaces\\Mario\\Mario_config.json"; 
 		
-		ProcessBuilder pb = new ProcessBuilder(new String[] { pythonExePath, pythonScriptPath, configFile });
+		String[] params = new String[] {pythonExePath, pythonScriptPath, gameConfigFile, modelConfigFile};
+        ProcessBuilder pb = new ProcessBuilder(params);
 		pb.redirectErrorStream(true);
 		Process p = pb.start();
 
