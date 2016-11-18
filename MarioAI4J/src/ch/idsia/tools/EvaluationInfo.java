@@ -34,6 +34,7 @@ import java.text.DecimalFormat;
 
 import ch.idsia.benchmark.mario.engine.sprites.Mario;
 import ch.idsia.benchmark.mario.engine.sprites.Mario.MarioMode;
+import ch.idsia.benchmark.mario.options.MarioOptions;
 import ch.idsia.tasks.MarioSystemOfValues;
 import ch.idsia.tasks.SystemOfValues;
 
@@ -206,27 +207,45 @@ public final class EvaluationInfo implements Cloneable {
 		} finally {			
 		}
 
+		
+		double gameTimeLimit = (double)MarioOptions.IntOption.SIMULATION_TIME_LIMIT.getDefaultValue();
+		
+		double status = ((marioStatus == Mario.STATUS_WIN) ? 1 : 0);
+		double mode = (double)marioMode.getCode() / 3.0;
+		double collisions = Math.log(collisionsWithCreatures + 1);
+		double passedDistance = ((double) distancePassedCells / (double)levelLength);
+		double spent = (double)timeSpent / gameTimeLimit;
+		double left = (double)timeLeft / gameTimeLimit;
+		
 		double coins = totalNumberOfCoins == 0 ? 0 : ((double)coinsGained / (double)totalNumberOfCoins);
 		double hidden = totalNumberOfHiddenBlocks == 0 ? 0 : ((double)hiddenBlocksFound / (double)totalNumberOfHiddenBlocks);
 		double mushDevoured = totalNumberOfMushrooms == 0 ? 0 : ((double)mushroomsDevoured / (double)totalNumberOfMushrooms);
 		double flowDevoured = totalNumberOfFlowers == 0 ? 0 : ((double)flowersDevoured / (double)totalNumberOfFlowers); 
-		double kills = totalNumberOfCreatures == 0 ? 0 : ((double)killsTotal / (double)totalNumberOfCreatures); 
+		double kills = totalNumberOfCreatures == 0 ? 0 : ((double)killsTotal / (double)totalNumberOfCreatures);
+		double killsFire = 0;
+		double killsShell = 0;
+		double killsStomp = 0;
+		if (kills > 0) {
+			killsFire = killsByFire / kills;
+			killsShell = killsByShell / kills;
+			killsStomp = killsByStomp / kills;
+		}
 		
-		return 
-				"status=" + ((marioStatus == Mario.STATUS_WIN) ? "1" : "0") + ";" +				
-				"mode=" + marioMode.ordinal() + ";" +
-				"collisionsWithCreatures=" + collisionsWithCreatures + ";" +
-				"passedDistance=" + ((double) distancePassedCells / (double)levelLength) + ";" +
-				"timeSpend=" + timeSpent + ";" +
-				"timeLeft=" + timeLeft + ";" +
+		return
+				"status=" + status + ";" +				
+				"mode=" + mode + ";" +
+				"collisionsWithCreatures=" + collisions + ";" +
+				"passedDistance=" + passedDistance + ";" +
+				"timeSpend=" + spent + ";" +
+				"timeLeft=" + left + ";" +
 				"coinsGained=" + coins + ";" +
 				"hiddenBlocksFound=" + hidden + ";" +
 				"mushroomsDevoured=" + mushDevoured + ";" +				
 				"flowersDevoured=" + flowDevoured + ";" +
 				"killsTotal=" + kills + ";" +
-				"killsByFire=" + killsByFire + ";" +
-				"killsByShell=" + killsByShell + ";" +
-				"killsByStomp=" + killsByStomp;
+				"killsByFire=" + killsFire + ";" +
+				"killsByShell=" + killsShell + ";" +
+				"killsByStomp=" + killsStomp;
 	}
 
 	public String toStringSingleLine() {
