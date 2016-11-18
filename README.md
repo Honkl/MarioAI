@@ -14,6 +14,12 @@ Refactored MarioAI code from: http://code.google.com/p/marioai/
 
 I did not mavenized projects as I usually do... so far you have to setup them within your IDE manually, but as they need only 2 libraries and projects feature rather standard Java project layout, it is trivial task (projects are directly importable into Eclipse).
 
+## General AI
+This game is used for General-AI project. For these purposes has been implemented interface for general-ai
+script running in python.
+
+Visit General-AI project repository here: https://github.com/Honkl/general-ai
+
 ## Change Log
 
 Things, which are different from original MarioAI v0.2.0 project:

@@ -159,7 +159,7 @@ public class MarioOptions {
 		LEVEL_EXIT_Y("ey", 0, "Position-Y of the exit within the level in tiles (if [0,0] -> moved to the right end of the level."),
 		
 		SIMULATION_MARIO_START_MODE("mm", 2, "Mario start mode, 2 -> FIRE, 1 -> LARGE, 0 -> SMALL."),
-		SIMULATION_TIME_LIMIT("tl", 200, "How many marioseconds Mario has to finish the level."),
+		SIMULATION_TIME_LIMIT("tl", 100, "How many marioseconds Mario has to finish the level."),
 		
 		VISUALIZATION_FPS("fps", 24, "FPS of visualization."),
 		VISUALIZATION_VIEW_LOCATION_X("vlx", 0, "Visualization window location x (in pixels)."),

@@ -114,9 +114,9 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 	public static void main(String[] args) throws IOException {
 		// UNCOMMENT THE LINE OF THE LEVEL YOU WISH TO RUN
 
-		// LevelConfig level = LevelConfig.LEVEL_0_FLAT;
+		 LevelConfig level = LevelConfig.LEVEL_0_FLAT;
 		// LevelConfig level = LevelConfig.LEVEL_1_JUMPING;
-		LevelConfig level = LevelConfig.LEVEL_2_GOOMBAS;
+		// LevelConfig level = LevelConfig.LEVEL_2_GOOMBAS;
 		// LevelConfig level = LevelConfig.LEVEL_3_TUBES;
 		// LevelConfig level = LevelConfig.LEVEL_4_SPIKIES;
 
