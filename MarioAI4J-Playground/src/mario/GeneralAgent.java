@@ -16,6 +16,7 @@ import ch.idsia.benchmark.mario.engine.generalization.Tile;
 import ch.idsia.benchmark.mario.engine.input.MarioControl;
 import ch.idsia.benchmark.mario.engine.input.MarioInput;
 import ch.idsia.benchmark.mario.environments.IEnvironment;
+import ch.idsia.benchmark.mario.options.FastOpts;
 import ch.idsia.tools.EvaluationInfo;
 
 /**
@@ -114,16 +115,16 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 	public static void main(String[] args) throws IOException {
 		// UNCOMMENT THE LINE OF THE LEVEL YOU WISH TO RUN
 
-		 LevelConfig level = LevelConfig.LEVEL_0_FLAT;
+		// LevelConfig level = LevelConfig.LEVEL_0_FLAT;
 		// LevelConfig level = LevelConfig.LEVEL_1_JUMPING;
-		// LevelConfig level = LevelConfig.LEVEL_2_GOOMBAS;
+		//LevelConfig level = LevelConfig.LEVEL_2_GOOMBAS;
 		// LevelConfig level = LevelConfig.LEVEL_3_TUBES;
-		// LevelConfig level = LevelConfig.LEVEL_4_SPIKIES;
+		LevelConfig level = LevelConfig.LEVEL_4_SPIKIES;
 
 		// CREATE SIMULATOR
-		//MarioSimulator simulator = new MarioSimulator(level.getOptions());
-		MarioSimulator simulator = new MarioSimulator(level.getOptionsVisualizationOff());
-		//MarioSimulator simulator = new MarioSimulator(level.getOptionsRandomized());
+		// MarioSimulator simulator = new MarioSimulator(level.getOptions());
+		MarioSimulator simulator = new MarioSimulator(level.getOptionsVisualizationOff() + FastOpts.L_RANDOMIZE);
+	    // MarioSimulator simulator = new MarioSimulator(level.getOptionsRandomized());
 
 		// CREATE SIMULATOR AND RANDOMIZE LEVEL GENERATION
 		// -- if you wish to use this, comment out the line above and uncomment
