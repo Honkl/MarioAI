@@ -113,31 +113,12 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 	}
 
 	public static void main(String[] args) throws IOException {
-		// UNCOMMENT THE LINE OF THE LEVEL YOU WISH TO RUN
 
-		// LevelConfig level = LevelConfig.LEVEL_0_FLAT;
-		// LevelConfig level = LevelConfig.LEVEL_1_JUMPING;
-		//LevelConfig level = LevelConfig.LEVEL_2_GOOMBAS;
-		// LevelConfig level = LevelConfig.LEVEL_3_TUBES;
-		LevelConfig level = LevelConfig.LEVEL_4_SPIKIES;
-
-		// CREATE SIMULATOR
-		// MarioSimulator simulator = new MarioSimulator(level.getOptions());
-		MarioSimulator simulator = new MarioSimulator(level.getOptionsVisualizationOff() + FastOpts.L_RANDOMIZE);
-	    // MarioSimulator simulator = new MarioSimulator(level.getOptionsRandomized());
-
-		// CREATE SIMULATOR AND RANDOMIZE LEVEL GENERATION
-		// -- if you wish to use this, comment out the line above and uncomment
-		// line below
-		// MarioSimulator simulator = new
-		// MarioSimulator(level.getOptionsRandomized());
-
-		// START PYTHON PROCESS
-		
+		// Start python process
 		String pythonScriptPath = args[0];
 		String pythonExePath = args[1];
 		String modelConfigFile = args[2];
-		
+		int gameBatchSize = Integer.parseInt(args[3]);
 		
 		//Config file for AI (relative path to master "general-ai/Game-interfaces" directory
 		String gameConfigFile = "Game-interfaces\\Mario\\Mario_config.json"; 
@@ -150,30 +131,35 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 		writer = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
 		reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		
-		// RUN THE SIMULATION
-		IAgent agent = new GeneralAgent();
-		EvaluationInfo info = simulator.run(agent);
+		double avgDist = 0;
+		for (int i = 0; i < gameBatchSize; i++) {
 
-		writer.write("END");
+			// LevelConfig level = LevelConfig.LEVEL_0_FLAT;
+			// LevelConfig level = LevelConfig.LEVEL_1_JUMPING;
+			LevelConfig level = LevelConfig.LEVEL_2_GOOMBAS;
+			// LevelConfig level = LevelConfig.LEVEL_3_TUBES;
+			// LevelConfig level = LevelConfig.LEVEL_4_SPIKIES;
 
-		// CHECK RESULT
-		switch (info.getResult()) {
-		case LEVEL_TIMEDOUT:
-			System.out.println("LEVEL TIMED OUT!");
-			break;
-
-		case MARIO_DIED:
-			System.out.println("MARIO KILLED");
-			break;
-
-		case SIMULATION_RUNNING:
-			System.out.println("SIMULATION STILL RUNNING?");
-			throw new RuntimeException("Invalid evaluation info state, simulation should not be running.");
-
-		case VICTORY:
-			System.out.println("VICTORY!!!");
-			break;
+			// MarioSimulator simulator = new MarioSimulator(level.getOptionsVisualizationOff() + FastOpts.L_RANDOM_SEED(1));
+		    MarioSimulator simulator = new MarioSimulator(level.getOptionsRndVissOff());
+		
+		    // RUN THE SIMULATION
+		    IAgent agent = new GeneralAgent();
+		    EvaluationInfo info = simulator.run(agent);
+		    avgDist += info.getPassedDistance();
 		}
+		avgDist /= gameBatchSize;
+		
+		System.out.println("passed_distance=" + avgDist);
+		
+		writer.write("END");
+		
+		writer.close();
+		reader.close();
 	}
-
 }
+
+
+
+
+

@@ -248,6 +248,12 @@ public final class EvaluationInfo implements Cloneable {
 				"killsByStomp=" + killsStomp;
 	}
 
+	public double getPassedDistance() {
+		double passedDistance = ((double) distancePassedCells / (double)levelLength);
+		return passedDistance;
+	}
+	
+	
 	public String toStringSingleLine() {
 		evaluationFinished = System.currentTimeMillis();
 		evaluationLasted = evaluationFinished - evaluationStarted;

@@ -173,7 +173,7 @@ public class JsonMessageObject {
 		String[] parts = outputFromAI.split(" ");
 		
 		if (parts.length != subsets.size()) {
-			throw new RuntimeException("Wrong number of results from AI.");
+			throw new RuntimeException("Wrong number of results from AI.\n " + outputFromAI);
 		}
 		
 		int maxIndex = -1;
