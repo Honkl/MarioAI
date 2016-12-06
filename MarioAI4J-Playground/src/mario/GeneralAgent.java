@@ -2,6 +2,7 @@ package mario;
 
 import java.awt.Graphics;
 import java.io.*;
+import java.util.Random;
 
 import ch.idsia.agents.AgentOptions;
 import ch.idsia.agents.IAgent;
@@ -119,6 +120,7 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 		String pythonExePath = args[1];
 		String modelConfigFile = args[2];
 		int gameBatchSize = Integer.parseInt(args[3]);
+		int seed = Integer.parseInt(args[4]);
 		
 		//Config file for AI (relative path to master "general-ai/Game-interfaces" directory
 		String gameConfigFile = "Game-interfaces\\Mario\\Mario_config.json"; 
@@ -131,6 +133,7 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 		writer = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
 		reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		
+		Random rng = new Random(seed);
 		double avgDist = 0;
 		for (int i = 0; i < gameBatchSize; i++) {
 
@@ -139,9 +142,8 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 			LevelConfig level = LevelConfig.LEVEL_2_GOOMBAS;
 			// LevelConfig level = LevelConfig.LEVEL_3_TUBES;
 			// LevelConfig level = LevelConfig.LEVEL_4_SPIKIES;
-
-			// MarioSimulator simulator = new MarioSimulator(level.getOptionsVisualizationOff() + FastOpts.L_RANDOM_SEED(1));
-		    MarioSimulator simulator = new MarioSimulator(level.getOptionsRndVissOff());
+			int nextSeed = Math.abs(rng.nextInt());
+		    MarioSimulator simulator = new MarioSimulator(level.getOptionsVisualizationOff() + FastOpts.L_RANDOM_SEED(nextSeed));
 		
 		    // RUN THE SIMULATION
 		    IAgent agent = new GeneralAgent();
