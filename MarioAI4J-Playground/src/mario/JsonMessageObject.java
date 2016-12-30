@@ -109,12 +109,18 @@ public class JsonMessageObject {
 			}
 		}
 		
-		for (int i = 0; i < e.entityField.length; i++) {
-			for (int j = 0; j < e.entityField[0].length; j++) {
-				List<Entity> ents = e.entityField[i][j];
-				for (double value : getWorstEnemyProperties(ents)) {
-					state.add(value);
-				}
+		int entitiesToAccount= 10; // we will account only 10 first entities
+		
+		for (int i = 0; i < entitiesToAccount; i++) {
+			Entity en;
+			if (e.entities.size() > i) {
+				en = e.entities.get(i);
+			} else {
+				// There is not enough entities (we set zeros)
+				en = null;
+			}
+			for (double value : getEntityProperties(en)) {
+				state.add(value);
 			}
 		}
 		
@@ -123,35 +129,21 @@ public class JsonMessageObject {
 		return result;
 	}
 	
-	private double[] getWorstEnemyProperties(List<Entity> ents) {
+	private double[] getEntityProperties(Entity en) {
 		int numOfProperties = 8;
-		if (ents.isEmpty()) {
+		if (en == null) {
 			return new double[numOfProperties];
 		}
-		
-		Entity worst = null;
-		for (Entity en : ents) {
-			if (en.type.equals(EntityType.SPIKES)) {
-				worst = en;
-				break;
-			} else if (en.type.equals(EntityType.DANGER)) {
-				worst = en;
-			}
-			if (en.type.equals(EntityType.NOTHING) && worst != null) {
-				continue;
-			}
-			worst = en;
-		}
-		
+
 		return new double[] { 
-				worst.dTX,
-				worst.dTY,
-				worst.dX,
-				worst.dY,
-				worst.height,
-				worst.speed.x,
-				worst.speed.y,
-				worst.type.ordinal()
+				en.dTX,
+				en.dTY,
+				en.dX,
+				en.dY,
+				en.height,
+				en.speed.x,
+				en.speed.y,
+				en.type.ordinal()
 			};
 	}
 	

@@ -40,6 +40,12 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 	private static BufferedWriter writer;
 	private static BufferedReader reader;
 
+	public GeneralAgent(BufferedReader reader, BufferedWriter writer) {
+		this.writer = writer;
+		this.reader = reader;
+		
+	}
+	
 	@Override
 	public void reset(AgentOptions options) {
 		super.reset(options);
@@ -130,8 +136,8 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 		pb.redirectErrorStream(true);
 		Process p = pb.start();
 
-		writer = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
-		reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+		BufferedWriter w = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
+		BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		
 		Random rng = new Random(seed);
 		double avgDist = 0;
@@ -146,7 +152,7 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 		    MarioSimulator simulator = new MarioSimulator(level.getOptionsVisualizationOff() + FastOpts.L_RANDOM_SEED(nextSeed));
 		
 		    // RUN THE SIMULATION
-		    IAgent agent = new GeneralAgent();
+		    IAgent agent = new GeneralAgent(r, w);
 		    EvaluationInfo info = simulator.run(agent);
 		    avgDist += info.getPassedDistance();
 		}
