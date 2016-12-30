@@ -10,6 +10,7 @@ import ch.idsia.benchmark.mario.engine.generalization.Entity;
 import ch.idsia.benchmark.mario.engine.generalization.EntityType;
 import ch.idsia.benchmark.mario.engine.generalization.MarioEntity;
 import ch.idsia.benchmark.mario.engine.generalization.Tile;
+import ch.idsia.benchmark.mario.engine.sprites.Mario;
 import jdk.management.resource.internal.inst.SocketOutputStreamRMHooks;
 import mario.GeneralAgent.MarioInputKey;
 
@@ -21,6 +22,7 @@ public class JsonMessageObject {
 	
 	// This property is not serialized via Gson
 	private transient List<List<MarioInputKey>> subsets;
+	private transient final int tileTypeCount = Tile.values().length;
 
 	/**
 	 * Initializes a new instance of JsonMessageObject. Represents the current
@@ -98,18 +100,26 @@ public class JsonMessageObject {
 		state.add((double)m.height);
 		state.add((double)m.speed.x);
 		state.add((double)m.speed.y);
-
+		
+		// RESCALE DATA
+		for (int i = 4; i <= 21; i++) {
+			if (state.get(i) > 0) {
+				state.set(i, Math.log(state.get(i)));
+			}
+		}
+		
 		// String / Enum
-		state.add((double)m.mode.ordinal());
+		state.add((double)m.mode.ordinal() / 3); // Rescale mario mode
 		
 		// ENVIROMENT VALUES
 		for (int i = 0; i < t.tileField.length; i++) {
 			for (int j = 0; j < t.tileField[0].length; j++) {
-				state.add((double)t.tileField[i][j].ordinal());
+				double value = (double)t.tileField[i][j].ordinal() / (double)tileTypeCount;
+				state.add(value);
 			}
 		}
 		
-		int entitiesToAccount= 10; // we will account only 10 first entities
+		int entitiesToAccount = 15; // we will account only 10 first entities
 		
 		for (int i = 0; i < entitiesToAccount; i++) {
 			Entity en;
@@ -135,7 +145,7 @@ public class JsonMessageObject {
 			return new double[numOfProperties];
 		}
 
-		return new double[] { 
+		double[] result = new double[] { 
 				en.dTX,
 				en.dTY,
 				en.dX,
@@ -145,6 +155,12 @@ public class JsonMessageObject {
 				en.speed.y,
 				en.type.ordinal()
 			};
+		for (int i = 0; i < result.length; i++) {
+			if (result[i] > 0) {
+				result[i] =  Math.log(result[i]);
+			}
+		}
+		return result;
 	}
 	
 	/**
