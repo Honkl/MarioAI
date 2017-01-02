@@ -7,11 +7,8 @@ import com.google.gson.*;
 
 import ch.idsia.agents.controllers.modules.*;
 import ch.idsia.benchmark.mario.engine.generalization.Entity;
-import ch.idsia.benchmark.mario.engine.generalization.EntityType;
 import ch.idsia.benchmark.mario.engine.generalization.MarioEntity;
 import ch.idsia.benchmark.mario.engine.generalization.Tile;
-import ch.idsia.benchmark.mario.engine.sprites.Mario;
-import jdk.management.resource.internal.inst.SocketOutputStreamRMHooks;
 import mario.GeneralAgent.MarioInputKey;
 
 public class JsonMessageObject {

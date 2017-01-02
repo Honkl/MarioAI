@@ -38,16 +38,20 @@ public class VisualizationTool {
 		// LevelConfig level = LevelConfig.LEVEL_1_JUMPING;
 		LevelConfig level = LevelConfig.LEVEL_2_GOOMBAS;
 		// LevelConfig level = LevelConfig.LEVEL_3_TUBES;
-		// LevelConfig level = LevelConfig.LEVEL_4_SPIKIES;
+		//LevelConfig level = LevelConfig.LEVEL_4_SPIKIES;
 		// MarioSimulator simulator = new MarioSimulator(level.getOptions() + FastOpts.L_RANDOM_SEED(seed));
 
 		// RUN THE SIMULATION
-		int iters = 200;
+		int iters = 250;
 		int wins = 0;
 		for (int i = 0; i < iters; i++) {
-			int seed = rng.nextInt();
-			MarioSimulator simulator = new MarioSimulator(level.getOptionsVisualizationOff() + FastOpts.L_RANDOM_SEED(seed));
-			//MarioSimulator simulator = new MarioSimulator(level.getOptions() + FastOpts.L_RANDOM_SEED(seed));
+			int seed = Math.abs(rng.nextInt());
+			String opts = level.getOptionsVisualizationOff();
+			//String opts = level.getOptions();
+					
+		    opts += FastOpts.L_RANDOM_SEED(seed);
+		    MarioSimulator simulator = new MarioSimulator(opts);
+			
 			IAgent agent = new GeneralAgent(reader, writer);
 			EvaluationInfo info = simulator.run(agent);
 			if (info.marioStatus == Mario.STATUS_WIN) {
