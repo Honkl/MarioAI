@@ -145,9 +145,9 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 
 			// LevelConfig level = LevelConfig.LEVEL_0_FLAT;
 			// LevelConfig level = LevelConfig.LEVEL_1_JUMPING;
-			LevelConfig level = LevelConfig.LEVEL_2_GOOMBAS;
+			// LevelConfig level = LevelConfig.LEVEL_2_GOOMBAS;
 			// LevelConfig level = LevelConfig.LEVEL_3_TUBES;
-			// LevelConfig level = LevelConfig.LEVEL_4_SPIKIES;
+			LevelConfig level = LevelConfig.LEVEL_4_SPIKIES;
 			int nextSeed = Math.abs(rng.nextInt());
 		    MarioSimulator simulator = new MarioSimulator(level.getOptionsVisualizationOff() + FastOpts.L_RANDOM_SEED(nextSeed));
 		

@@ -14,12 +14,21 @@ import ch.idsia.tools.EvaluationInfo;
 
 public class VisualizationTool {
 	public static void main(String[] args) throws IOException {
-
-		// Start python process
 		String pythonScriptPath = args[0];
 		String pythonExePath = args[1];
-		String modelConfigFile = args[2];
-		int gameBatchSize = Integer.parseInt(args[3]);
+		
+		
+		double[] winRates = new double[5];
+		for (int i = 0; i < winRates.length; i++) {
+			String modelConfigFile = "C:/Users/Jan/Desktop/best_" + i + ".json";
+			winRates[i] = evaluateModel(pythonScriptPath, pythonExePath, modelConfigFile);
+		}		
+	}
+
+	/**
+	 * Evaluates specified model and returns its win rate.
+	 */
+	private static double evaluateModel(String pythonScriptPath, String pythonExePath, String modelConfigFile) throws IOException {
 		
 		//Config file for AI (relative path to master "general-ai/Game-interfaces" directory
 		String gameConfigFile = "Game-interfaces\\Mario\\Mario_config.json"; 
@@ -36,9 +45,9 @@ public class VisualizationTool {
 
 		// LevelConfig level = LevelConfig.LEVEL_0_FLAT;
 		// LevelConfig level = LevelConfig.LEVEL_1_JUMPING;
-		LevelConfig level = LevelConfig.LEVEL_2_GOOMBAS;
+		//LevelConfig level = LevelConfig.LEVEL_2_GOOMBAS;
 		// LevelConfig level = LevelConfig.LEVEL_3_TUBES;
-		//LevelConfig level = LevelConfig.LEVEL_4_SPIKIES;
+		LevelConfig level = LevelConfig.LEVEL_4_SPIKIES;
 		// MarioSimulator simulator = new MarioSimulator(level.getOptions() + FastOpts.L_RANDOM_SEED(seed));
 
 		// RUN THE SIMULATION
@@ -56,17 +65,21 @@ public class VisualizationTool {
 			EvaluationInfo info = simulator.run(agent);
 			if (info.marioStatus == Mario.STATUS_WIN) {
 				wins++;
-				System.out.println("WIN");
+				//System.out.println("WIN");
+				
 			} else {
-				System.out.println("LOSE");
+				//System.out.println("LOSE");
 			}
 		}
 		
-		System.out.println("WIN RATE: " + ((double)wins / iters) * 100 + "% ("+ wins + "/" + iters + ")");
+		double winRate = ((double)wins / iters) * 100;
+		System.out.println("WIN RATE: " + winRate + "% ("+ wins + "/" + iters + ")");
 		
 		writer.write("END");
 		
 		writer.close();
 		reader.close();
+		
+		return winRate;
 	}
 }
