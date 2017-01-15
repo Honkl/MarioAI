@@ -20,7 +20,8 @@ public class VisualizationTool {
 		
 		double[] winRates = new double[5];
 		for (int i = 0; i < winRates.length; i++) {
-			String modelConfigFile = "C:/Users/Jan/Desktop/best_" + i + ".json";
+			String modelConfigFile = "C:/Users/Jan/Desktop/models/best_" + i + ".json";
+			System.out.println("Testing model: " + modelConfigFile);
 			winRates[i] = evaluateModel(pythonScriptPath, pythonExePath, modelConfigFile);
 		}		
 	}
