@@ -121,23 +121,11 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 
 	public static void main(String[] args) throws IOException {
 
-		// Start python process
-		String pythonScriptPath = args[0];
-		String pythonExePath = args[1];
-		String modelConfigFile = args[2];
-		int gameBatchSize = Integer.parseInt(args[3]);
-		int seed = Integer.parseInt(args[4]);
-		
-		//Config file for AI (relative path to master "general-ai/Game-interfaces" directory
-		String gameConfigFile = "Game-interfaces\\Mario\\Mario_config.json"; 
-		
-		String[] params = new String[] {pythonExePath, pythonScriptPath, gameConfigFile, modelConfigFile};
-        ProcessBuilder pb = new ProcessBuilder(params);
-		pb.redirectErrorStream(true);
-		Process p = pb.start();
+		int seed = Integer.parseInt(args[0]);
+		int gameBatchSize = Integer.parseInt(args[1]);
 
-		BufferedWriter w = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
-		BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+		BufferedWriter w = new BufferedWriter(new OutputStreamWriter(System.out));
+		BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
 		
 		Random rng = new Random(seed);
 		double avgDist = 0;
@@ -145,9 +133,9 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 
 			// LevelConfig level = LevelConfig.LEVEL_0_FLAT;
 			// LevelConfig level = LevelConfig.LEVEL_1_JUMPING;
-			// LevelConfig level = LevelConfig.LEVEL_2_GOOMBAS;
+			LevelConfig level = LevelConfig.LEVEL_2_GOOMBAS;
 			// LevelConfig level = LevelConfig.LEVEL_3_TUBES;
-			LevelConfig level = LevelConfig.LEVEL_4_SPIKIES;
+			// LevelConfig level = LevelConfig.LEVEL_4_SPIKIES;
 			int nextSeed = Math.abs(rng.nextInt());
 		    MarioSimulator simulator = new MarioSimulator(level.getOptionsVisualizationOff() + FastOpts.L_RANDOM_SEED(nextSeed));
 		
@@ -159,8 +147,6 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 		avgDist /= gameBatchSize;
 		
 		System.out.println("passed_distance=" + avgDist);
-		
-		writer.write("END");
 		
 		writer.close();
 		reader.close();
