@@ -39,10 +39,16 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 
 	private static BufferedWriter writer;
 	private static BufferedReader reader;
+	
+	private float score = 0;
+	private double reward = 0;
+	private MarioSimulator sim = null;
+	
 
-	public GeneralAgent(BufferedReader reader, BufferedWriter writer) {
+	public GeneralAgent(BufferedReader reader, BufferedWriter writer, MarioSimulator sim) {
 		this.writer = writer;
 		this.reader = reader;
+		this.sim = sim;
 		
 	}
 	
@@ -78,7 +84,8 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 	@Override
 	public MarioInput actionSelectionAI() {
 		try {
-			JsonMessageObject jmo = new JsonMessageObject(mario, e, t);
+			score = this.sim.getScore();
+			JsonMessageObject jmo = new JsonMessageObject(mario, e, t, reward, score, false);
 			String json = jmo.convertToJson() + "\n";
 			//System.out.println(json);
 			writer.write(json);
@@ -106,6 +113,9 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 				}
 			}
 			
+			
+			
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -113,6 +123,11 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 		
 		
 		return action;
+	}
+	
+	@Override
+	public void receiveReward(float intermediateReward) {
+		this.reward = intermediateReward;
 	}
 
 	public enum MarioInputKey {
@@ -128,7 +143,8 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 		BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
 		
 		Random rng = new Random(seed);
-		double avgDist = 0;
+		float avgDist = 0;
+		GeneralAgent agent = null;
 		for (int i = 0; i < gameBatchSize; i++) {
 
 			// LevelConfig level = LevelConfig.LEVEL_0_FLAT;
@@ -138,16 +154,20 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 			// LevelConfig level = LevelConfig.LEVEL_4_SPIKIES;
 			int nextSeed = Math.abs(rng.nextInt());
 		    MarioSimulator simulator = new MarioSimulator(level.getOptionsVisualizationOff() + FastOpts.L_RANDOM_SEED(nextSeed));
-		
+		    
 		    // RUN THE SIMULATION
-		    IAgent agent = new GeneralAgent(r, w);
+		    agent = new GeneralAgent(r, w, simulator);
 		    EvaluationInfo info = simulator.run(agent);
-		    avgDist += info.getPassedDistance();
+		    avgDist += info.getPassedDistance();		    
 		}
 		avgDist /= gameBatchSize;
 		
-		System.out.println("passed_distance=" + avgDist);
-		
+		// game-batch-size is 1 always when we are using last state / rewards...
+		JsonMessageObject jmo = new JsonMessageObject(agent.mario, agent.e, agent.t, agent.reward, avgDist, true);
+		String json = jmo.convertToJson() + "\n";
+		writer.write(json);
+		writer.flush();
+						
 		writer.close();
 		reader.close();
 	}

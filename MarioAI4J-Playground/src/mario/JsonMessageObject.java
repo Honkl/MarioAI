@@ -17,6 +17,10 @@ public class JsonMessageObject {
 	int current_phase = 0;
 	Double[] state;
 	
+	double[] score = new double[1];
+	double reward = 0.0;
+	int done = 0;
+	
 	// This property is not serialized via Gson
 	private transient List<List<MarioInputKey>> subsets;
 	private transient final int tileTypeCount = Tile.values().length;
@@ -25,8 +29,13 @@ public class JsonMessageObject {
 	 * Initializes a new instance of JsonMessageObject. Represents the current
 	 * state of the game.
 	 */
-	public JsonMessageObject(MarioEntity m, Entities e, Tiles t) {
+	public JsonMessageObject(MarioEntity m, Entities e, Tiles t, double reward, float score, boolean done) {
 		state = encodeState(m, e, t);
+		
+		this.reward = reward;
+		this.score[0] = score;
+		this.done = done ? 1 : 0;
+			
 				
 		// Generate subsets of available actions.  AI agent will choose
 		// one of those subsets as a result (which will be decoded back

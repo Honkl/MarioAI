@@ -62,6 +62,7 @@ public class MarioSimulator {
 	}
 	
 	private String options;
+	private MarioEnvironment env = null;
 
 	public MarioSimulator(String options) {
 		this.options = options;
@@ -75,6 +76,10 @@ public class MarioSimulator {
 			else first = false;
 			this.options += " " + option;			
 		}
+	}
+	
+	public float getScore() {
+		return this.env.getScore();
 	}
 	
 	public synchronized EvaluationInfo run(IAgent agent) {
@@ -92,6 +97,8 @@ public class MarioSimulator {
 		
 		IEnvironment environment = MarioEnvironment.getInstance();
 		environment.reset(agent);
+		
+		env = (MarioEnvironment)environment;
 				
 		//System.out.println("[MarioSimulator] SIMULATION RUNNING!");
 		

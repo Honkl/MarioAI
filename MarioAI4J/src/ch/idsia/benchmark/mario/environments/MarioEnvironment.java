@@ -497,8 +497,11 @@ public final class MarioEnvironment implements IEnvironment {
 	}
 
 	public int getIntermediateReward() {
-		// TODO: reward for coins, killed creatures, cleared dead-ends, bypassed gaps, hidden blocks found
-		return levelScene.getBonusPoints();
+		return levelScene.getBonusPoints() + (levelScene.mario.mapX / levelScene.getLevelLength() * 100);
+	}
+	
+	public float getScore() {
+		return (float)levelScene.mario.mapX / (float)levelScene.getLevelLength();
 	}
 
 	public void closeRecorder() {

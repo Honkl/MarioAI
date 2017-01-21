@@ -62,7 +62,7 @@ public class VisualizationTool {
 		    opts += FastOpts.L_RANDOM_SEED(seed);
 		    MarioSimulator simulator = new MarioSimulator(opts);
 			
-			IAgent agent = new GeneralAgent(reader, writer);
+			IAgent agent = new GeneralAgent(reader, writer); // TODO
 			EvaluationInfo info = simulator.run(agent);
 			if (info.marioStatus == Mario.STATUS_WIN) {
 				wins++;
