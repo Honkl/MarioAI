@@ -5,6 +5,10 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Random;
 import ch.idsia.agents.IAgent;
 import ch.idsia.benchmark.mario.MarioSimulator;
@@ -13,74 +17,81 @@ import ch.idsia.benchmark.mario.options.FastOpts;
 import ch.idsia.tools.EvaluationInfo;
 
 public class VisualizationTool {
-	public static void main(String[] args) throws IOException {
-		String pythonScriptPath = args[0];
-		String pythonExePath = args[1];
+	public static void main(String[] args) throws Exception {
+		if (args.length != 3) {
+			System.err.println("Wrong number of arguments. Expected 3 got " + args.length);
+		}
+		int numberOfGames = Integer.parseInt(args[0]);
+		String levelType = args[1];
+		int visualize = Integer.parseInt(args[2]);
 		
-		
-		double[] winRates = new double[5];
-		for (int i = 0; i < winRates.length; i++) {
-			String modelConfigFile = "C:/Users/Jan/Desktop/models/best_" + i + ".json";
-			System.out.println("Testing model: " + modelConfigFile);
-			winRates[i] = evaluateModel(pythonScriptPath, pythonExePath, modelConfigFile);
-		}		
+		LevelConfig level;
+		switch (levelType) {
+		case "flat":
+			level = LevelConfig.LEVEL_0_FLAT;
+			break;
+		case "jumping":
+			level = LevelConfig.LEVEL_1_JUMPING;
+			break;
+		case "gombas":
+			level = LevelConfig.LEVEL_2_GOOMBAS;
+			break;
+		case "tubes":
+			level = LevelConfig.LEVEL_3_TUBES;
+			break;
+		case "spikes":
+			level = LevelConfig.LEVEL_4_SPIKIES;
+			break;
+		default:
+			throw new Exception("Unknown level");
+		}
+
+		evaluateModel(numberOfGames, level, visualize);
 	}
 
 	/**
-	 * Evaluates specified model and returns its win rate.
+	 * Evaluates specified model and writes it to a file.
 	 */
-	private static double evaluateModel(String pythonScriptPath, String pythonExePath, String modelConfigFile) throws IOException {
-		
-		//Config file for AI (relative path to master "general-ai/Game-interfaces" directory
-		String gameConfigFile = "Game-interfaces\\Mario\\Mario_config.json"; 
-		
-		String[] params = new String[] {pythonExePath, pythonScriptPath, gameConfigFile, modelConfigFile};
-        ProcessBuilder pb = new ProcessBuilder(params);
-		pb.redirectErrorStream(true);
-		Process p = pb.start();
+	private static void evaluateModel(int numberOfRuns, LevelConfig level, int visualize) throws IOException {
 
-		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
-		BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+		BufferedWriter w = new BufferedWriter(new OutputStreamWriter(System.out));
+		BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
 		
 		Random rng = new Random(42);
-
-		// LevelConfig level = LevelConfig.LEVEL_0_FLAT;
-		// LevelConfig level = LevelConfig.LEVEL_1_JUMPING;
-		//LevelConfig level = LevelConfig.LEVEL_2_GOOMBAS;
-		// LevelConfig level = LevelConfig.LEVEL_3_TUBES;
-		LevelConfig level = LevelConfig.LEVEL_4_SPIKIES;
-		// MarioSimulator simulator = new MarioSimulator(level.getOptions() + FastOpts.L_RANDOM_SEED(seed));
-
-		// RUN THE SIMULATION
-		int iters = 250;
+		GeneralAgent agent = null;
 		int wins = 0;
-		for (int i = 0; i < iters; i++) {
-			int seed = Math.abs(rng.nextInt());
-			String opts = level.getOptionsVisualizationOff();
-			//String opts = level.getOptions();
-					
-		    opts += FastOpts.L_RANDOM_SEED(seed);
-		    MarioSimulator simulator = new MarioSimulator(opts);
-			
-			IAgent agent = new GeneralAgent(reader, writer); // TODO
-			EvaluationInfo info = simulator.run(agent);
+		for (int i = 0; i < numberOfRuns; i++) {
+			int nextSeed = Math.abs(rng.nextInt());
+		    MarioSimulator simulator;
+		    if (visualize == 1) {
+		    	simulator = new MarioSimulator(level.getOptions() + FastOpts.L_RANDOM_SEED(nextSeed));
+		    } else {
+		    	simulator = new MarioSimulator(level.getOptionsVisualizationOff() + FastOpts.L_RANDOM_SEED(nextSeed));
+		    }
+		    
+		    // Run the simulation
+		    agent = new GeneralAgent(r, w, simulator);
+		    EvaluationInfo info = simulator.run(agent);
+		    
 			if (info.marioStatus == Mario.STATUS_WIN) {
 				wins++;
-				//System.out.println("WIN");
-				
-			} else {
-				//System.out.println("LOSE");
 			}
 		}
+		double winRate = ((double)wins / numberOfRuns) * 100;
 		
-		double winRate = ((double)wins / iters) * 100;
-		System.out.println("WIN RATE: " + winRate + "% ("+ wins + "/" + iters + ")");
-		
-		writer.write("END");
-		
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+		Date date = new Date();
+		String time = dateFormat.format(date);
+		PrintWriter writer = new PrintWriter("evaluation_results_" + time + ".txt");
+		writer.write("Mario evaluation\n");
+		writer.write("WIN RATE: " + winRate + "% ("+ wins + "/" + numberOfRuns + ")");
+		writer.flush();
 		writer.close();
-		reader.close();
 		
-		return winRate;
+		JsonMessageObject jmo = new JsonMessageObject(agent.mario, agent.e, agent.t, agent.reward, (float)winRate, true);
+		String json = jmo.convertToJson() + "\n";
+		w.write(json);
+		w.close();
+		r.close();
 	}
 }

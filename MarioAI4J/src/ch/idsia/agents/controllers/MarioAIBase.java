@@ -60,7 +60,7 @@ public abstract class MarioAIBase extends MarioAgentBase {
 	/**
 	 * Information about Mario's body.
 	 */
-	protected MarioEntity mario;
+	public MarioEntity mario;
 	
 	/**
 	 * Actions an {@link IAgent} wants to perform.
@@ -72,9 +72,9 @@ public abstract class MarioAIBase extends MarioAgentBase {
 	 */
 	protected MarioControl control = new MarioControl(action);
 	
-	protected Entities e = new Entities();
+	public Entities e = new Entities();
 	
-	protected Tiles t = new Tiles();
+	public Tiles t = new Tiles();
 	
 	public MarioAIBase() {
 		super("MarioAIBase");

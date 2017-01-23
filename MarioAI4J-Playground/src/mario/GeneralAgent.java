@@ -40,9 +40,9 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 	private static BufferedWriter writer;
 	private static BufferedReader reader;
 	
-	private float score = 0;
-	private double reward = 0;
-	private MarioSimulator sim = null;
+	public float score = 0;
+	public double reward = 0;
+	public MarioSimulator sim = null;
 	
 
 	public GeneralAgent(BufferedReader reader, BufferedWriter writer, MarioSimulator sim) {
