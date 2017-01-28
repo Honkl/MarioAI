@@ -191,7 +191,7 @@ public class JsonMessageObject {
 		}
 		
 		int maxIndex = -1;
-		double maxValue = Double.MIN_VALUE;
+		double maxValue = Double.NEGATIVE_INFINITY;
 		for (int i = 0; i < subsets.size(); i++) {
 			double value = Double.parseDouble(parts[i]);
 			if (value > maxValue) {
