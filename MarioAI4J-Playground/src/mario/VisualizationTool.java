@@ -83,8 +83,9 @@ public class VisualizationTool {
 		Date date = new Date();
 		String time = dateFormat.format(date);
 		PrintWriter writer = new PrintWriter("mario_results_" + time + ".txt");
-		writer.write("Mario evaluation \n");
-		writer.write("WIN RATE: " + winRate + "% ("+ wins + "/" + numberOfRuns + ")");
+		writer.println("Mario evaluation");
+		writer.println(level.toString());
+		writer.println("WIN RATE: " + winRate + "% ("+ wins + "/" + numberOfRuns + ")");
 		writer.flush();
 		writer.close();
 		
