@@ -496,14 +496,29 @@ public final class MarioEnvironment implements IEnvironment {
 		this.agent = agent;
 	}
 
+	//
+	//
+	//
+	
+	private int lastReward = 0;
+	
 	public int getIntermediateReward() {
-		return levelScene.getBonusPoints() + (levelScene.mario.mapX / levelScene.getLevelLength() * 100);
+		//int reward = levelScene.getBonusPoints() + levelScene.mario.mapX;
+		int reward = levelScene.mario.mapX;
+		
+		int rewardChange = reward - lastReward;
+		lastReward = reward;
+		return rewardChange;
 	}
 	
 	public float getScore() {
 		return (float)levelScene.mario.mapX / (float)levelScene.getLevelLength();
 	}
 
+	//
+	//
+	//
+	
 	public void closeRecorder() {
 		if (recorder != null) {
 			try {
