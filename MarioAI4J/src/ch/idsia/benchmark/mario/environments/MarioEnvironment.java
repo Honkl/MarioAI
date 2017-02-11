@@ -500,15 +500,18 @@ public final class MarioEnvironment implements IEnvironment {
 	//
 	//
 	
-	private int lastReward = 0;
+	private int lastPosition = 0;
+	private int lastPoints = 0;
 	
 	public int getIntermediateReward() {
 		//int reward = levelScene.getBonusPoints() + levelScene.mario.mapX;
-		int reward = levelScene.mario.mapX;
+		int position = levelScene.mario.mapX;
+		int points = levelScene.getKillsTotal() * 10;
+		int reward = (position - lastPosition) + (points - lastPoints);
 		
-		int rewardChange = reward - lastReward;
-		lastReward = reward;
-		return rewardChange;
+		lastPosition = position;
+		lastPoints = points;
+		return reward;
 	}
 	
 	public float getScore() {
