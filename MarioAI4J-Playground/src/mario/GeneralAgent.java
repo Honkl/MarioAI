@@ -96,8 +96,8 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 				System.err.println("WRONG AI RESULT (null)");
 			}
 			
-			for (MarioInputKey key : jmo.decodeMove(output)) {
-				switch (key) {
+			MarioInputKey selectedAction = jmo.decodeMove(output);
+			switch (selectedAction) {
 				case RUN_LEFT:
 					control.runLeft();
 					break;
@@ -113,12 +113,7 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 				case SPRINT:
 					control.sprint();
 					break;
-				}
 			}
-			
-			
-			
-			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -151,10 +146,10 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 		for (int i = 0; i < gameBatchSize; i++) {
 
 			// LevelConfig level = LevelConfig.LEVEL_0_FLAT;
-			// LevelConfig level = LevelConfig.LEVEL_1_JUMPING;
+			LevelConfig level = LevelConfig.LEVEL_1_JUMPING;
 			// LevelConfig level = LevelConfig.LEVEL_2_GOOMBAS;
 			// LevelConfig level = LevelConfig.LEVEL_3_TUBES;
-			LevelConfig level = LevelConfig.LEVEL_4_SPIKIES;
+			// LevelConfig level = LevelConfig.LEVEL_4_SPIKIES;
 			int nextSeed = Math.abs(rng.nextInt());
 		    MarioSimulator simulator = new MarioSimulator(level.getOptionsVisualizationOff() + FastOpts.L_RANDOM_SEED(nextSeed));
 		    
