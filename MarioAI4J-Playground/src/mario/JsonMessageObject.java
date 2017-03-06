@@ -7,6 +7,7 @@ import com.google.gson.*;
 
 import ch.idsia.agents.controllers.modules.*;
 import ch.idsia.benchmark.mario.engine.generalization.Entity;
+import ch.idsia.benchmark.mario.engine.generalization.EntityType;
 import ch.idsia.benchmark.mario.engine.generalization.MarioEntity;
 import ch.idsia.benchmark.mario.engine.generalization.Tile;
 import ch.idsia.benchmark.mario.engine.sprites.Mario.MarioMode;
@@ -26,6 +27,35 @@ public class JsonMessageObject {
 	private transient List<MarioInputKey> marioMoves;
 	private transient final int tileTypeCount = Tile.values().length;
 	private transient final int totalMoves = 5;
+	
+	// Stores all "used" entites / tiles types
+	private transient Object[] items = new Object[] { 
+			Tile.NOTHING,
+			Tile.BRICK,
+			Tile.BORDER_HILL,
+			Tile.BORDER_CANNOT_PASS_THROUGH,
+			Tile.FLOWER_POT,
+			Tile.FLOWER_POT_OR_CANNON,
+			Tile.PRINCESS,
+			
+			EntityType.DANGER,
+			EntityType.GOOMBA,
+			EntityType.GOOMBA_WINGED,
+			EntityType.WAVE_GOOMBA,
+			
+			EntityType.ENEMY_FLOWER,
+			EntityType.FIRE_FLOWER,
+			EntityType.GREEN_KOOPA,
+			EntityType.GREEN_KOOPA_WINGED,
+			
+			EntityType.MUSHROOM,
+			EntityType.SHELL_MOVING,
+			EntityType.SHELL_STILL,
+			
+			EntityType.SPIKES,
+			EntityType.SPIKY,
+			EntityType.SPIKY_WINGED			
+	};
 
 	/**
 	 * Initializes a new instance of JsonMessageObject. Represents the current
@@ -88,57 +118,58 @@ public class JsonMessageObject {
 		state.add(booleanToDouble(m.mode == MarioMode.LARGE));
 		state.add(booleanToDouble(m.mode == MarioMode.SMALL));
 		
+		String test = "";
+		
 		// ENVIRONMENT VALUES
+		// Loop over visible field (19 x 19) and store tiles and proper entities:
 		for (int i = 0; i < t.tileField.length; i++) {
 			for (int j = 0; j < t.tileField[0].length; j++) {
-				double value = (double)t.tileField[i][j].ordinal();
+				double value = getRepresentation(t.tileField[i][j], e.entityField[i][j]);
 				state.add(value);
 			}
 		}
-		
-		int entitiesToAccount = 10; // we will account only 10 first entities
-		for (int i = 0; i < entitiesToAccount; i++) {
-			Entity en;
-			if (e.entities.size() > i) {
-				en = e.entities.get(i);
-			} else {
-				// There is not enough entities (we set zeros)
-				en = null;
-			}
-			for (double value : getEntityProperties(en)) {
-				state.add(value);
-			}
-		}
-		
+			
 		Double[] result = new Double[state.size()];
 		state.toArray(result);
-		// System.err.println("STATE SIZE: " + state.size()); // Debug ..
+		// System.err.println("STATE SIZE: " + state.size()); // Debug purposes
 		return result;
 	}
 	
-	private double[] getEntityProperties(Entity en) {
-		int numOfProperties = 8;
-		if (en == null) {
-			return new double[numOfProperties];
-		}
-
-		double[] result = new double[] { 
-				en.dTX,
-				en.dTY,
-				en.dX,
-				en.dY,
-				en.height,
-				en.speed.x,
-				en.speed.y,
-				en.type.ordinal()
-			};
-		for (int i = 0; i < result.length - 1; i++) {
-			// Do not scale ordinal()
-			if (result[i] > 0) {
-				result[i] =  Math.log(result[i]);
+	/**
+	 * Evaluates a numeric representation for specific position. Tile t and entities ens are on that position.
+	 * @param t Tile at the specific position.
+	 * @param ens Entities on the specific position.
+	 * @return Numeric representation for specific position.
+	 */
+	private double getRepresentation(Tile t, List<Entity> ens) {
+		Entity result = null;
+		if (ens.size() > 0) {
+			// SEARCH FOR THE MOST DANGEROUS ONE
+			result = ens.get(0);
+			for (Entity entity : ens) {
+				if (result.type.getKind().getThreatLevel() > entity.type.getKind().getThreatLevel()) result = entity;
+			}
+			
+			for (int i = 0; i < items.length; i++) {
+				if (items[i].equals(result.type)) {
+					return i;
+				}
+				
 			}
 		}
-		return result;
+		
+		for (int i = 0; i < items.length; i++) {
+			if (items[i].equals(t)) {
+				return i;
+			}
+		}
+		
+		if (result != null) {
+			if (result.type.equals(EntityType.FIREBALL) || result.type.equals(EntityType.NOTHING)) {
+				return 0;
+			}
+		}
+		return -1;
 	}
 	
 	/**
