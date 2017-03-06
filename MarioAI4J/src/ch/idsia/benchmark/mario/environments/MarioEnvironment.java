@@ -50,6 +50,7 @@ import ch.idsia.benchmark.mario.engine.input.MarioInput;
 import ch.idsia.benchmark.mario.engine.level.Level;
 import ch.idsia.benchmark.mario.engine.sprites.Mario;
 import ch.idsia.benchmark.mario.engine.sprites.Sprite;
+import ch.idsia.benchmark.mario.engine.sprites.Mario.MarioMode;
 import ch.idsia.benchmark.mario.options.AIOptions;
 import ch.idsia.benchmark.mario.options.MarioOptions;
 import ch.idsia.benchmark.mario.options.SystemOptions;
@@ -501,16 +502,40 @@ public final class MarioEnvironment implements IEnvironment {
 	//
 	
 	private int lastPosition = 0;
-	private int lastPoints = 0;
+	private int lastKills = 0;
+	private MarioMode lastMarioMode = MarioMode.FIRE_LARGE;
 	
+	/**
+	 * Evaluates immediate reward for the AI. Used in reinforcement learning.
+	 */
 	public int getIntermediateReward() {
-		//int reward = levelScene.getBonusPoints() + levelScene.mario.mapX;
+		// Position part
 		int position = levelScene.mario.mapX;
-		int points = levelScene.getKillsTotal() * 10;
-		int reward = (position - lastPosition) + (points - lastPoints);
-		
+		int positionDifference = position - lastPosition;
+		if (positionDifference < 0) {
+			positionDifference = 0;
+		}
 		lastPosition = position;
-		lastPoints = points;
+		
+		// Kills part
+		int kills = levelScene.getKillsTotal();
+		int killsDifference = kills - lastKills;
+		lastKills = kills;
+		
+		// Lives part
+		int lostLive = 0;
+		MarioMode currentMode = levelScene.getMarioMode();
+		if (!currentMode.equals(lastMarioMode)) {
+			lostLive = 1;
+			lastMarioMode = currentMode;
+		}
+		
+		int reward = positionDifference + (10 * killsDifference) + (-100 * lostLive);
+		
+		//if (reward != 0) {
+		// System.err.println("REWARD: " + positionDifference + " " + (10 * killsDifference) + " " + (-100 * lostLive) + " = " + reward);
+		//}
+		
 		return reward;
 	}
 	
