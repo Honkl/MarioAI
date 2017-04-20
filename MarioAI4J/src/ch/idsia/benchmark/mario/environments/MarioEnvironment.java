@@ -530,7 +530,12 @@ public final class MarioEnvironment implements IEnvironment {
 			lastMarioMode = currentMode;
 		}
 		
-		int reward = positionDifference + (10 * killsDifference) + (-100 * lostLive);
+		// Constants for evaluating reward:
+		int alpha = 1;
+		int beta = 10;
+		int gamma = 100;						
+		
+		int reward = (alpha * positionDifference) + (beta * killsDifference) - (gamma * lostLive);
 		
 		//if (reward != 0) {
 		// System.err.println("REWARD: " + positionDifference + " " + (10 * killsDifference) + " " + (-100 * lostLive) + " = " + reward);
