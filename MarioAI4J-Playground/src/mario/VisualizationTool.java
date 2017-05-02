@@ -59,7 +59,7 @@ public class VisualizationTool {
 		
 		Random rng = new Random(42);
 		GeneralAgent agent = null;
-		int wins = 0;
+		double avgDist = 0;
 		for (int i = 0; i < numberOfRuns; i++) {
 			int nextSeed = Math.abs(rng.nextInt());
 		    MarioSimulator simulator;
@@ -73,23 +73,22 @@ public class VisualizationTool {
 		    agent = new GeneralAgent(r, w, simulator);
 		    EvaluationInfo info = simulator.run(agent);
 		    
-			if (info.marioStatus == Mario.STATUS_WIN) {
-				wins++;
-			}
+		    avgDist += info.getPassedDistance();		    
 		}
-		double winRate = ((double)wins / numberOfRuns) * 100;
+		
+		avgDist /= numberOfRuns; 
 		
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
 		Date date = new Date();
 		String time = dateFormat.format(date);
 		PrintWriter writer = new PrintWriter("mario_results_" + time + ".txt");
-		writer.println("Mario evaluation");
+		writer.println("Mario evaluation [" + numberOfRuns + " tests]");
 		writer.println(level.toString());
-		writer.println("WIN RATE: " + winRate + "% ("+ wins + "/" + numberOfRuns + ")");
+		writer.println("WIN RATE (avg dist passed): " + avgDist);
 		writer.flush();
 		writer.close();
 		
-		JsonMessageObject jmo = new JsonMessageObject(agent.mario, agent.e, agent.t, agent.reward, (float)winRate, true);
+		JsonMessageObject jmo = new JsonMessageObject(agent.mario, agent.e, agent.t, agent.reward, (float)avgDist, true);
 		String json = jmo.convertToJson() + "\n";
 		w.write(json);
 		w.close();
