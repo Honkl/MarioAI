@@ -1,9 +1,13 @@
 Refactored MarioAI code from: http://code.google.com/p/marioai/
 
 # MarioAI Version 0.3.1
+## General Artificial Interface
+This game is used for project 'General artificial intelligecne for game playing'. For project purposes, we implemented own interface for communication between AI and the game. Whole general AI project is available [here](https://github.com/Honkl/general-ai).
+Some important things for this project:
+- Interface that we use is in directory `MarioAI4J-Playground/src/mario` (priority is `GeneralAgent.java`)
+- Reward must be defined in [`MarioEnviroment.java`](https://github.com/Honkl/MarioAI/blob/master/MarioAI4J/src/ch/idsia/benchmark/mario/environments/MarioEnvironment.java) file
 
 ## Project structure
-
 **MarioAI4J** -> main project containing MarioSimulator (runnable as is), which is featuring keyboard-controlled mario, use arrows + A(jump) + S(peed/hoot) ... oh and do not forget to try to press 'G' (multiple times) to visualize Mario's receptive field
 
 **MarioAI4J-Agents** -> example agents, this project must reference MarioAI4J in order to compile
@@ -13,12 +17,6 @@ Refactored MarioAI code from: http://code.google.com/p/marioai/
 **MarioAI4J-Playground** -> here you can start coding your own Mario AI right away, just navigate to MarioAgent and fool around (required MarioAI4J, MarioAI4J-Tournament + its libs on path).
 
 I did not mavenized projects as I usually do... so far you have to setup them within your IDE manually, but as they need only 2 libraries and projects feature rather standard Java project layout, it is trivial task (projects are directly importable into Eclipse).
-
-## General AI
-This game is used for General-AI project. For these purposes has been implemented interface for general-ai
-script running in python.
-
-Visit General-AI project repository here: https://github.com/Honkl/general-ai
 
 ## Change Log
 
