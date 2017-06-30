@@ -6,6 +6,7 @@ This game is used for project 'General artificial intelligecne for game playing'
 Some important things for this project:
 - Interface that we use is in directory `MarioAI4J-Playground/src/mario` (priority is `GeneralAgent.java`)
 - Reward must be defined in [`MarioEnviroment.java`](https://github.com/Honkl/MarioAI/blob/master/MarioAI4J/src/ch/idsia/benchmark/mario/environments/MarioEnvironment.java) file
+- Compilation not needed (for general-ai usage, only download of this repository). More information can be found at general-ai repository.
 
 ## Project structure
 **MarioAI4J** -> main project containing MarioSimulator (runnable as is), which is featuring keyboard-controlled mario, use arrows + A(jump) + S(peed/hoot) ... oh and do not forget to try to press 'G' (multiple times) to visualize Mario's receptive field
