@@ -48,8 +48,7 @@ public class GeneralAgent extends MarioHijackAIBase implements IAgent {
 	public GeneralAgent(BufferedReader reader, BufferedWriter writer, MarioSimulator sim) {
 		this.writer = writer;
 		this.reader = reader;
-		this.sim = sim;
-		
+		this.sim = sim;		
 	}
 	
 	@Override
